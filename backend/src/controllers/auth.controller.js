@@ -1,7 +1,8 @@
 
-import {upsertStreamUser} from "../lib/stream.js";
+import { upsertStreamUser } from "../lib/stream.js";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+
 
 
 export async function signup(req, res) {
@@ -46,16 +47,16 @@ export async function signup(req, res) {
         });
 
         // TODO:Create a User in Stream
-        try{
-           await upsertStreamUser({
-             id:newUser._id.toString(),
-             name:newUser.fullName,
-             image:newUser.profilePic|| ""
-        });
-        console.log(`stream User created for ${newUser.fullName}`)
+        try {
+            await upsertStreamUser({
+                id: newUser._id.toString(),
+                name: newUser.fullName,
+                image: newUser.profilePic || ""
+            });
+            console.log(`stream User created for ${newUser.fullName}`)
         }
-        catch(error){
-           console.log("Error creating Stream User:",error);
+        catch (error) {
+            console.log("Error creating Stream User:", error);
         }
 
         const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET_KEY, {
@@ -122,24 +123,85 @@ export async function login(req, res) {
         });
 
         res.status(200).json({
-            success:true,
+            success: true,
             user
         });
 
 
     }
     catch (error) {
-       console.log("Error in login Controller",error.message);
-       res.status(500).json({
-        message:"Internal Server Error"
-       })
+        console.log("Error in login Controller", error.message);
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
     }
 }
 
 export async function logout(req, res) {
     res.clearCookie("jwt");
     res.status(200).json({
-        success:true,
-        message:"Logout successfully"
+        success: true,
+        message: "Logout successfully"
     });
+}
+
+export async function onboard(req, res) {
+    try {
+        const userId = req.user._id;
+
+        const { fullName, bio, nativeLanguage, learningLanguage, location } = req.body
+
+        if (!fullName || !bio || !nativeLanguage || !learningLanguage || !location) {
+            return res.status(400).json({
+                message: "All fields are required",
+                missingFields: [
+                    !fullName && "fullName",
+                    !bio && "bio",
+                    !nativeLanguage && "nativeLanguage",
+                    !learningLanguage && "learningLanguage",
+                    !location && "location",
+                ].filter(Boolean)
+            });
+
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, {
+            ...req.body,
+            isOnboarded: true,
+        }, { new: true })
+
+        if (!updatedUser)
+            return res.status(404).json({
+                message: "User not Found"
+            })
+
+        // Todo: Update the user info in stream
+
+        try {
+          await upsertStreamUser({
+            id:updatedUser._id.toString(),
+            name:updatedUser.fullName,
+            image:updatedUser.profilePic || ""
+          });
+          console.log(`Steam user updated after onboarding for ${updatedUser.fullName}`);
+        }
+        catch (streamError) {
+          console.log("Error updating Stream User during Onboarding:",streamError.message);
+        }
+
+
+        res.status(200).json({
+            success: true,
+            user: updatedUser
+        })
+
+
+
+    }
+    catch (error) {
+        console.log("Onboarding error :", error);
+        res.status(500).json({
+            message: "Intrenal Server Error"
+        });
+    }
 }

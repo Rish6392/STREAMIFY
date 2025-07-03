@@ -11,6 +11,7 @@ router.post("/signup",signup);
 router.post("/login",login);
 
 router.post("/logout",logout);
+//forget password and many more can be created
 
 router.post("/onboarding",protectRoute,onboard);
 

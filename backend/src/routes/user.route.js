@@ -14,6 +14,7 @@ router.get("/friends",getMyFriends)
 
 router.post("/friend-request/:id",sendFriendRequest);
 router.put("/friend-request/:id/accept",acceptFriendRequest);
+//reject friend req and many more can be created
 
 router.get("/friend-requests",getFriendRequests);
 router.get("/outgoing-friend-requests",getOutgoingfriendReqs);

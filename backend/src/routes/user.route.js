@@ -1,6 +1,6 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
-import {getFriendRequests,acceptFriendRequest,sendFriendRequest, getRecommendedUsers,getMyFriends } from "../controllers/user.controller.js";
+import {getOutgoingfriendReqs,getFriendRequests,acceptFriendRequest,sendFriendRequest, getRecommendedUsers,getMyFriends } from "../controllers/user.controller.js";
 
 
 
@@ -16,5 +16,6 @@ router.post("/friend-request/:id",sendFriendRequest);
 router.put("/friend-request/:id/accept",acceptFriendRequest);
 
 router.get("/friend-requests",getFriendRequests);
+router.get("/outgoing-friend-requests",getOutgoingfriendReqs);
 
 export default router;

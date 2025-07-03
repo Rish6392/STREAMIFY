@@ -94,3 +94,47 @@ export async function sendFriendRequest(req,res) {
     });
   }
 }
+
+export async function acceptFriendRequest(req,res){
+  try{
+    const {id:requestId} = req.params
+
+    const friendRequest = await FriendRequest.findById(requestId);
+
+    if(!friendRequest){
+      return res.status(400).json({
+        message:"Friend request not found"
+      });
+    }
+
+    if(friendRequest.recipient.toString()!==req.user.id){
+      return res.status(403).json({
+        message:"You are not authorized to accept this request"
+      });
+    }
+
+    friendRequest.status = "accepted";
+    await friendRequest.save();
+    
+    // addeach user to the others friend array
+    // $addToSet: adds elemet to an array only if they do not already exist
+    await User.findByIdAndUpdate(friendRequest.sender,{
+      $addToSet:{friends:friendRequest.recipient},
+    })
+
+    await User.findByIdAndUpdate(friendRequest.recipient,{
+      $addToSet:{friends:friendRequest.sender},
+    });
+
+    res.status(200).json({
+      message:"Friend request sccepted"
+    })
+
+  }
+  catch(error){
+    console.log("Error in acceptedFriendRequest controller",error.message);
+    res.status(500).json({
+      message:"Intrenal Server Error"
+    });
+  }
+}

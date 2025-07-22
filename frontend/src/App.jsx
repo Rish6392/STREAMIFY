@@ -10,14 +10,14 @@ import OnboardingPage from "./pages/OnboardingPage.jsx";
 
 import { Toaster } from "react-hot-toast";
 
-import { useQuery } from "@tanstack/react-query";
-import { axiosInstance } from "./lib/axios.js";
+import { useQuery } from "@tanstack/react-query"; //useQuery: A React hook from react-query for fetching and caching data.
+import { axiosInstance } from "./lib/axios.js"; //axiosInstance: A pre-configured Axios instance to make API calls (probably includes base URL, headers, etc.)
 
 
-
+//This fetches the current logged-in user from the backend (/auth/me).
 const App = () => {
   const { data: authData, isLoading, error } = useQuery({
-    queryKey: ["authUser"],
+    queryKey: ["authUser"],  // uniquely identifies this request in the cache.
     queryFn: async () => {
       const res = await axiosInstance.get("/auth/me");
       return res.data;
@@ -25,7 +25,7 @@ const App = () => {
     retry: false,
   });
 
-  const authUser = authData?.user;
+  const authUser = authData?.user; //Grabs the actual user object from the data (if it exists).//backent auth route
 
   return (
     <div className="h-screen">

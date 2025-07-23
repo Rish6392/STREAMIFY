@@ -3,7 +3,9 @@ import { ShipWheelIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
-import axiosInstace from '../lib/axios.js'; // Assuming you have an axios instance set up
+//import axiosInstace from '../lib/axios.js'; // Assuming you have an axios instance set up
+import { signup } from '../lib/api.js'; // Import the signup function
+
 
 const SignUpPage = () => {
   // This is a placeholder for the SignUpPage component.
@@ -14,20 +16,22 @@ const SignUpPage = () => {
   });
 
   const queryClient = useQueryClient();
+  //const navigate = useNavigate(); // <-- initialize navigate
 
- const {mutate,isPending,error} = useMutation({  //coming from tanstack query
-  mutationFn:async()=>{
-    const response = await axiosInstace.post('/auth/signup', signupData);
-    return response.data;
-  },
-  onSuccess:()=>queryClient.invalidateQueries({ queryKey: ['authUser'] }),//refetch this query
 
+ const {mutate:signupMutation,isPending,error} = useMutation({  //coming from tanstack query
+  mutationFn:signup,
+  onSuccess:()=>
+  queryClient.invalidateQueries({ queryKey: ['authUser'] }),//refetch this query
+  //navigate("/"); // Redirect to home page after successful signup
+  
+  //},
   
 });
 
   const handleSignup = (e) => {
     e.preventDefault();
-    mutate();
+    signupMutation(signupData); // Call the signup mutation with the signupData
   }
   return (
     <div className='h-screen flex items-center justify-center p-4 sm:p-6 md:p-8' data-theme="forest">
@@ -43,6 +47,13 @@ const SignUpPage = () => {
               Streamify
             </span>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className='alert alert-error shadow-lg mb-4'>
+              <span>  {error.response.data.message}</span>
+            </div>
+          )}
 
           <div className='w-full'>
             <form onSubmit={handleSignup}>
@@ -115,7 +126,15 @@ const SignUpPage = () => {
                 </div>
 
                 <button className='btn btn-primary w-full' type='submit'>
-                  {isPending ? "Signing Up..." : "Create Account"}
+                 {isPending?(
+                  <>
+                  <span className='loading loading-spinner loading-xs'>
+                    Loading...
+                  </span>
+                  </>
+                 ):(
+                  "Create Account"
+                 )}
                 </button>
 
                 <div className="text-center mt-4">

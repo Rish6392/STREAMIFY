@@ -11,7 +11,7 @@ import OnboardingPage from "./pages/OnboardingPage.jsx";
 import { Toaster } from "react-hot-toast";
 
 import { useQuery } from "@tanstack/react-query"; //useQuery: A React hook from react-query for fetching and caching data.
-import { axiosInstance } from "./lib/axios.js"; //axiosInstance: A pre-configured Axios instance to make API calls (probably includes base URL, headers, etc.)
+import axiosInstance from "./lib/axios.js"; //axiosInstance: A pre-configured Axios instance to make API calls (probably includes base URL, headers, etc.)
 
 
 //This fetches the current logged-in user from the backend (/auth/me).

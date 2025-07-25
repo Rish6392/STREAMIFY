@@ -1,11 +1,11 @@
 import React from 'react';
 import { ShipWheelIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { useQueryClient } from '@tanstack/react-query';
-//import axiosInstace from '../lib/axios.js'; // Assuming you have an axios instance set up
-import { signup } from '../lib/api.js'; // Import the signup function
-
+// import { useMutation } from '@tanstack/react-query';
+// import { useQueryClient } from '@tanstack/react-query';
+// //import axiosInstace from '../lib/axios.js'; // Assuming you have an axios instance set up
+// import { signup } from '../lib/api.js'; // Import the signup function
+import useSignUp from '../hooks/useSignUp'; // Custom hook for signup
 
 const SignUpPage = () => {
   // This is a placeholder for the SignUpPage component.
@@ -15,19 +15,20 @@ const SignUpPage = () => {
     password: "",
   });
 
-  const queryClient = useQueryClient();
-  //const navigate = useNavigate(); // <-- initialize navigate
+
+  // This is how we did it at first, without using our custom hook
+//   const queryClient = useQueryClient();
 
 
- const {mutate:signupMutation,isPending,error} = useMutation({  //coming from tanstack query
-  mutationFn:signup,
-  onSuccess:()=>
-  queryClient.invalidateQueries({ queryKey: ['authUser'] }),//refetch this query
-  //navigate("/"); // Redirect to home page after successful signup
-  
-  //},
-  
-});
+
+//  const {mutate:signupMutation,isPending,error} = useMutation({  //coming from tanstack query
+//   mutationFn:signup,
+//   onSuccess:()=>
+//   queryClient.invalidateQueries({ queryKey: ['authUser'] }),//refetch this query
+
+// });
+
+ const {isPending,error,signupMutation} = useSignUp();
 
   const handleSignup = (e) => {
     e.preventDefault();

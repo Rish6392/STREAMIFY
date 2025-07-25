@@ -17,12 +17,15 @@ import { Toaster } from "react-hot-toast";
 //import { getAuthUser } from "./lib/api.js";
 import useAuthUser from "./hooks/useAuthUser.js";
 import { Home } from "lucide-react";
+import { useThemeStore } from "./store/useThemeStore.js";
 
 
 //This fetches the current logged-in user from the backend (/auth/me).
 const App = () => {
 
   const {isLoading,authUser} = useAuthUser();
+  const {theme} = useThemeStore();
+  //const [data,setData] = useState();
 
   const isAuthenticated = Boolean(authUser);
   const isOnboarded = authUser?.isOnboarded;
@@ -32,7 +35,8 @@ const App = () => {
   if(isLoading) return <PageLoader/>;
 
   return (
-    <div className="h-screen">
+    <div className="h-screen" data-theme={theme}>
+    
       <Routes>
         <Route path="/" element={isAuthenticated && isOnboarded ? (
           <Layout showSidebar={true}>
@@ -52,7 +56,7 @@ const App = () => {
             <OnboardingPage/>
           ):(<Navigate to="/" />)
          ):(
-          <Navigate to="/login" />
+          <Navigate to="/login"/>
          )}
          />
       </Routes>

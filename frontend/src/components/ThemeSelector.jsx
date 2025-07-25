@@ -2,6 +2,12 @@ import { PaletteIcon } from "lucide-react";
 import { useThemeStore } from "../store/useThemeStore";
 import { THEMES } from "../constants";
 
+//This ThemeSelector component is a theme picker dropdown in a React app that uses:
+//✅ zustand for state management (useThemeStore)
+//✅ A list of themes (THEMES)
+//✅ lucide-react icons (PaletteIcon)
+//✅ TailwindCSS and DaisyUI-style classes (like btn, dropdown, etc.)
+
 const ThemeSelector = () => {
   const { theme, setTheme } = useThemeStore();
 

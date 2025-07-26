@@ -9,7 +9,7 @@ export async function getRecommendedUsers(req,res) {
         const recommendedUsers= await User.find({
               $and:[
                 {_id:{$ne:currentUserId}},// excludes current user
-                {$id:{$nin:currentUser.friends}}, // excludes current users friends
+                {_id:{$nin:currentUser.friends}}, // excludes current users friends
                 {isOnboarded:true}
               ]
         })

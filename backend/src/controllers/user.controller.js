@@ -3,6 +3,7 @@ import FriendRequest from "../models/FriendRequest.js"
 
 export async function getRecommendedUsers(req,res) {
      try{
+      console.log("Fetching recommended users for:", req.user.id);
         const currentUserId = req.user.id;
         const currentUser = req.user
 
@@ -13,6 +14,8 @@ export async function getRecommendedUsers(req,res) {
                 {isOnboarded:true}
               ]
         })
+        console.log("Current user:", currentUserId, currentUser.friends);
+        console.log("Recommended users:", recommendedUsers);
        res.status(200).json(recommendedUsers)
      }
      catch(error){
@@ -23,9 +26,11 @@ export async function getRecommendedUsers(req,res) {
 
 export async function getMyFriends(req,res) {
     try{
-      const user = await user.findById(req.user.id)
+      const user = await User.findById(req.user.id)
       .select("friends")
-      .populate("friends","fullName profilePic nativelanguage learningLanguage");
+      .populate("friends","fullName profilePic nativeLanguage learningLanguage");
+
+      res.status(200).json(user.friends);
     }
     catch(error){
           console.log("Error in getMyfriends controller",error.message);
@@ -144,12 +149,12 @@ export async function getFriendRequests(req,res){
     const incomingReqs = await FriendRequest.find({
       recipient:req.user.id,
       status:"pending",
-    }).populate("sender","fullName profilePic nativelanguage learningLanguage");
+    }).populate("sender","fullName profilePic nativeLanguage learningLanguage");
 
-    const acceptedReqs = await friendRequest.find({
+    const acceptedReqs = await FriendRequest.find({
       sender:req.user.id,
       status:"accepted",
-    }).populate("recipient","fullname profilePic");
+    }).populate("recipient","fullName profilePic");
 
     res.status(200).json({incomingReqs,acceptedReqs});
   }

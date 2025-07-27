@@ -38,6 +38,7 @@ export async function getUserFriends() {
 }
 
 export async function getRecommendedUsers() {
+  console.log("inside the recomedn uyse")
   const response = await axiosInstance.get("/users");
   return response.data;
 }

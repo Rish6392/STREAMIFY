@@ -28,7 +28,7 @@ const HomePage = () => {
    })
 
     const {data:recommendedUsers=[],isLoading:loadingUsers}= useQuery({
-    queryKey:["friends"],
+    queryKey:["users"],
     queryFn:getRecommendedUsers
    })
 
@@ -37,6 +37,12 @@ const HomePage = () => {
     queryKey:["outgoingFriendReqs"],
     queryFn:getOutgoingFriendReqs
    })
+
+  //  useEffect(() => {
+  //   // Whenever recommendedUsers changes, we can log it or perform any other side effect.
+  //   console.log("Recommended users updated:", recommendedUsers);
+  //  },[recommendedUsers])
+
 
    //useMutation handles sending a friend request.
    //sendRequestMutation is the function you call to trigger the mutation.

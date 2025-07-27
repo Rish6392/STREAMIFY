@@ -21,8 +21,8 @@ app.use(cookieParser()); // req.body
 
 // Routes
 app.use("/api/auth",authRoutes);
-app.use("api/users",userRoutes);
-app.use("api/auth",chatRoutes);
+app.use("/api/users",userRoutes);
+app.use("/api/chat",chatRoutes);
 
 app.listen(PORT,()=>{
     console.log(`Server is running on port ${PORT}`);

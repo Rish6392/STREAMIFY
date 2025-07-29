@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import useAuthUser from "../hooks/useAuthUser";
 import {useQuery} from "@tanstack/react-query";
-import { getSreamToken } from '../lib/api';
+import { getStreamToken } from '../lib/api';
 import { toast } from 'react-hot-toast';
 
 import {
@@ -34,7 +34,7 @@ const ChatPage = () => {
 
   const {data:tokenData} = useQuery({
     queryKey:["streamToken"],
-    queryFn:getSreamToken,
+    queryFn:getStreamToken,
     enabled:!!authUser  // this will run only if authUser is available
   });
 
@@ -80,7 +80,17 @@ const ChatPage = () => {
     initChat();
   },[tokenData,authUser,targetUserId]);
 
-  const handleVideoCall = () =>{};
+  const handleVideoCall = () =>{
+    if(channel){
+      const callUrl = `${window.location.origin}/call/${channel.id}`;
+
+      channel.sendMessage({
+        text:`I've started a video call. Join me here: ${callUrl}`,
+      })
+
+      toast.success("Video Call link sent successfully!");
+    }
+  };
 
   if(loading|| !chatClient || !channel) return <ChatLoader/>;
 

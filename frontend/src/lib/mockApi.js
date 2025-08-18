@@ -18,7 +18,20 @@ const db = {
       learningLanguage: '',
       location: '',
       isOnboarded: true,
-      friends: [],
+      friends: ['u2'],
+    },
+    {
+      _id: 'u2',
+      fullName: 'Crish',
+      email: 'crish@example.com',
+      password: 'password',
+      profilePic: 'https://avatar.iran.liara.run/public/2.png',
+      bio: 'Language buddy',
+      nativeLanguage: 'hindi',
+      learningLanguage: 'italian',
+      location: 'Delhi, IN',
+      isOnboarded: true,
+      friends: ['u1'],
     },
   ],
   sessions: {}, // key by cookie token
@@ -127,7 +140,14 @@ export function enableMockApi() {
     return [200, db.users];
   });
 
-  onBoth(mock, 'get', '/users/friends', () => [200, []]);
+  onBoth(mock, 'get', '/users/friends', () => {
+    const token = getCookie('jwt');
+    const uid = token && db.sessions[token];
+    const user = db.users.find(u => u._id === uid);
+    if (!user) return [401, { message: 'Unauthorised-No Token provided' }];
+    const friends = user.friends.map(fid => db.users.find(u => u._id === fid)).filter(Boolean);
+    return [200, friends];
+  });
   onBoth(mock, 'get', '/users/friend-requests', () => [200, []]);
   onBoth(mock, 'get', '/users/outgoing-friend-requests', () => [200, []]);
   mock.onPost(/\/(api\/)?users\/friend-request\//).reply(() => [200, { success: true }]);

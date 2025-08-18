@@ -17,10 +17,27 @@ const PORT = process.env.PORT;
 
 const __dirname = path.resolve();
 
+// Configure CORS for cookie-based auth
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+].concat(process.env.FRONTEND_ORIGIN ? [process.env.FRONTEND_ORIGIN] : []);
+
 app.use(cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173"], // Allow requests from this origin
-    credentials: true, // Allow frontend to send cookies
+    origin: function (origin, callback) {
+        // Allow non-browser requests with no origin
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        // Also allow any vercel.app subdomain if wanted
+        if (/\.vercel\.app$/.test(origin)) return callback(null, true);
+        return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
 }));
+
+// Preflight handled by cors middleware; ensure express parses JSON and cookies
 app.use(express.json()); //req.body
 app.use(cookieParser()); // req.body
 

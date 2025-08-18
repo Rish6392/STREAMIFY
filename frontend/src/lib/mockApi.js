@@ -36,11 +36,22 @@ function getCookie(name) {
   return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
+function onBoth(mock, method, path, handler) {
+  const register = (m, p) => {
+    if (m === 'get') mock.onGet(p).reply(handler);
+    if (m === 'post') mock.onPost(p).reply(handler);
+    if (m === 'put') mock.onPut(p).reply(handler);
+  };
+  register(method, path);
+  // Also register with /api prefix to catch baseURL-prefixed URLs
+  register(method, `/api${path.startsWith('/') ? '' : '/'}${path}`);
+}
+
 export function enableMockApi() {
   const mock = new MockAdapter(axiosInstance, { delayResponse: 400 });
 
   // Auth: /auth/signup
-  mock.onPost('/auth/signup').reply(config => {
+  onBoth(mock, 'post', '/auth/signup', config => {
     const body = JSON.parse(config.data || '{}');
     const { email, password, fullName } = body;
     if (!email || !password || !fullName) {
@@ -70,7 +81,7 @@ export function enableMockApi() {
   });
 
   // Auth: /auth/login
-  mock.onPost('/auth/login').reply(config => {
+  onBoth(mock, 'post', '/auth/login', config => {
     const body = JSON.parse(config.data || '{}');
     const { email, password } = body;
     const user = db.users.find(u => u.email === email);
@@ -84,13 +95,13 @@ export function enableMockApi() {
   });
 
   // Auth: /auth/logout
-  mock.onPost('/auth/logout').reply(() => {
+  onBoth(mock, 'post', '/auth/logout', () => {
     setCookie('jwt', '', -1);
     return [200, { success: true, message: 'Logout successfully' }];
   });
 
   // Auth: /auth/me
-  mock.onGet('/auth/me').reply(() => {
+  onBoth(mock, 'get', '/auth/me', () => {
     const token = getCookie('jwt');
     const uid = token && db.sessions[token];
     const user = db.users.find(u => u._id === uid);
@@ -99,7 +110,7 @@ export function enableMockApi() {
   });
 
   // Onboarding
-  mock.onPost('/auth/onboarding').reply(config => {
+  onBoth(mock, 'post', '/auth/onboarding', config => {
     const token = getCookie('jwt');
     const uid = token && db.sessions[token];
     const user = db.users.find(u => u._id === uid);
@@ -110,20 +121,20 @@ export function enableMockApi() {
   });
 
   // Minimal users endpoints used by UI
-  mock.onGet('/users').reply(() => {
+  onBoth(mock, 'get', '/users', () => {
     const token = getCookie('jwt');
     if (!token || !db.sessions[token]) return [401, { message: 'Unauthorised-No Token provided' }];
     return [200, db.users];
   });
 
-  mock.onGet('/users/friends').reply(() => [200, []]);
-  mock.onGet('/users/friend-requests').reply(() => [200, []]);
-  mock.onGet('/users/outgoing-friend-requests').reply(() => [200, []]);
-  mock.onPost(/\/users\/friend-request\//).reply(() => [200, { success: true }]);
-  mock.onPut(/\/users\/friend-request\/.+\/accept/).reply(() => [200, { success: true }]);
+  onBoth(mock, 'get', '/users/friends', () => [200, []]);
+  onBoth(mock, 'get', '/users/friend-requests', () => [200, []]);
+  onBoth(mock, 'get', '/users/outgoing-friend-requests', () => [200, []]);
+  mock.onPost(/\/(api\/)?users\/friend-request\//).reply(() => [200, { success: true }]);
+  mock.onPut(/\/(api\/)?users\/friend-request\/.+\/accept/).reply(() => [200, { success: true }]);
 
   // Chat token mock
-  mock.onGet('/chat/token').reply(() => {
+  onBoth(mock, 'get', '/chat/token', () => {
     return [200, { token: 'mock-stream-token' }];
   });
 }

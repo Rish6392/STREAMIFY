@@ -18,7 +18,12 @@ const PORT = process.env.PORT;
 const __dirname = path.resolve();
 
 app.use(cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173"], // Allow requests from this origin
+    origin: [
+        "http://localhost:5173", 
+        "http://127.0.0.1:5173",
+        "https://streamify-two-theta.vercel.app",
+        /\.vercel\.app$/
+    ], 
     credentials: true, // Allow frontend to send cookies
 }));
 app.use(express.json()); //req.body
@@ -37,7 +42,16 @@ if(process.env.NODE_ENV === "production") {
     })
 }
 
-app.listen(PORT,()=>{
-    console.log(`Server is running on port ${PORT}`);
+// For local development
+if (process.env.NODE_ENV !== "production") {
+    app.listen(PORT,()=>{
+        console.log(`Server is running on port ${PORT}`);
+        connectDB();
+    });
+} else {
+    // For Vercel serverless
     connectDB();
-})
+}
+
+// Export for Vercel
+export default app;

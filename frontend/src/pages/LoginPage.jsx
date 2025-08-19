@@ -1,4 +1,4 @@
-import React, { use } from 'react'
+import React from 'react'
 // import { useMutation } from '@tanstack/react-query';
 // import { useQueryClient } from '@tanstack/react-query';
 // import { login } from '../lib/api.js'; // Import the login function
@@ -54,7 +54,7 @@ const LoginPage = () => {
           {/* ERROR MESSAGE DISPLAY */}
           {error && (
             <div className="alert alert-error mb-4">
-              <span>{error.response.data.message}</span>
+              <span>{error?.response?.data?.message || error?.message || "Something went wrong"}</span>
             </div>
           )}
 

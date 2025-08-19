@@ -21,6 +21,7 @@ const __dirname = path.resolve();
 const allowedOrigins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://streamify-two-theta.vercel.app"
 ].concat(process.env.FRONTEND_ORIGIN ? [process.env.FRONTEND_ORIGIN] : []);
 
 app.use(cors({

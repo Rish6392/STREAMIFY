@@ -19,6 +19,7 @@ import { Toaster } from "react-hot-toast";
 import useAuthUser from "./hooks/useAuthUser.js";
 import { Home } from "lucide-react";
 import { useThemeStore } from "./store/useThemeStore.js";
+import ProfilePage from "./pages/ProfilePage.jsx";
 
 
 //This fetches the current logged-in user from the backend (/auth/me).
@@ -93,6 +94,22 @@ const App = () => {
           <Navigate to="/login"/>
          )}
          />
+
+         <Route path="/profile" element={<ProfilePage />} />
+
+          {/* Edit profile uses the same UI as onboarding but is available after onboarding */}
+          <Route
+            path="/profile/edit"
+            element={
+              isAuthenticated && isOnboarded ? (
+                <OnboardingPage />
+              ) : (
+                <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+              )
+            }
+          />
+
+
       </Routes>
       <Toaster />
     </div>

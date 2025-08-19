@@ -7,12 +7,16 @@ import useAuthUser from '../hooks/useAuthUser';
 import { completeOnboarding } from '../lib/api';
 import { LoaderIcon, MapPinIcon, ShipWheelIcon, ShuffleIcon, CameraIcon } from "lucide-react";
 import { LANGUAGES } from "../constants";
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 const OnboardingPage = () => {
    
   const {authUser} = useAuthUser(); // This hook fetches the current logged-in user from the backend (/auth/me).
   const queryClient = useQueryClient(); // This is used to invalidate queries after the mutation is successful.
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isEditMode = location.pathname === "/profile/edit";
 
    const [formState, setFormState] = useState({ //Initializes a local formState object using useState to hold the user's onboarding form values.
     fullName: authUser?.fullName || "",
@@ -26,8 +30,11 @@ const OnboardingPage = () => {
   const {mutate:onboardingMutation,isPending} = useMutation({
       mutationFn : completeOnboarding, //(assumed to be an imported API function) is the function that sends the onboarding data to the server.
       onSuccess:()=>{
-        toast.success("Onboarding completed successfully!");
+        toast.success(isEditMode ? "Profile updated successfully!" : "Onboarding completed successfully!");
         queryClient.invalidateQueries({queryKey: ["authUser"]}); // Invalidate the authUser query to refresh the user data.
+        if (isEditMode) {
+          navigate('/profile');
+        }
       },
 
       onError: (error) => {
@@ -54,7 +61,7 @@ const OnboardingPage = () => {
     <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
       <div className="card bg-base-200 w-full max-w-3xl shadow-xl">
         <div className="card-body p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6">Complete Your Profile</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6">{isEditMode ? 'Update Your Profile' : 'Complete Your Profile'}</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* PROFILE PIC CONTAINER */}
@@ -175,16 +182,16 @@ const OnboardingPage = () => {
 
             {/* SUBMIT BUTTON */}
 
-            <button className="btn btn-primary w-full" disabled={isPending} type="submit">
+    <button className="btn btn-primary w-full" disabled={isPending} type="submit">
               {!isPending ? (
                 <>
                   <ShipWheelIcon className="size-5 mr-2" />
-                  Complete Onboarding
+      {isEditMode ? 'Save Changes' : 'Complete Onboarding'}
                 </>
               ) : (
                 <>
                   <LoaderIcon className="animate-spin size-5 mr-2" />
-                  Onboarding...
+      {isEditMode ? 'Saving...' : 'Onboarding...'}
                 </>
               )}
             </button>

@@ -44,10 +44,18 @@ const Navbar = () => {
           {/* TODO */}
           <ThemeSelector />
 
-          <div className="avatar">
+          {/* <div className="avatar">
             <div className="w-9 rounded-full">
               <img src={authUser?.profilePic} alt="User Avatar" rel="noreferrer" />
             </div>
+          </div> */}
+
+          <div className="avatar">
+            <Link to="/profile" className="w-9 rounded-full block">
+              <div className="w-9 rounded-full cursor-pointer hover:opacity-90">
+                <img src={authUser?.profilePic} alt="User Avatar" rel="noreferrer" />
+              </div>
+            </Link>
           </div>
 
           {/* Logout button */}

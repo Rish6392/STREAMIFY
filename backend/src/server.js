@@ -5,6 +5,7 @@ import cors from "cors";
 dotenv.config();
 
 import path from "path";
+import fs from "fs";
 
 
 import authRoutes from "./routes/auth.route.js";
@@ -50,11 +51,15 @@ app.use("/api/users",userRoutes);
 app.use("/api/chat",chatRoutes);
 
 if(process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname,"../frontend/dist")));
+    const frontendDistPath = path.join(__dirname,"../frontend/dist");
+    // Only serve static frontend files if the directory exists (won't exist on Render since frontend is on Vercel)
+    if(fs.existsSync(frontendDistPath)) {
+        app.use(express.static(frontendDistPath));
 
-    app.get("*",(req,res)=>{
-        res.sendFile(path.join(__dirname,"../frontend","dist","index.html"));
-    })
+        app.get("*",(req,res)=>{
+            res.sendFile(path.join(frontendDistPath,"index.html"));
+        })
+    }
 }
 
 app.listen(PORT,()=>{
